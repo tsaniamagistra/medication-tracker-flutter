@@ -1,5 +1,6 @@
 class Medicine {
   final String? id;
+  final String? user;
   final String? name;
   final String? dosage;
   final int? frequency;
@@ -7,12 +8,13 @@ class Medicine {
   final String? additionalInfo;
   final List<DoseSchedules>? doseSchedules;
   final String? timezone;
-  final int? price;
+  final double? price;
   final String? currency;
   final int? v;
 
   Medicine({
     this.id,
+    this.user,
     this.name,
     this.dosage,
     this.frequency,
@@ -27,6 +29,7 @@ class Medicine {
 
   Medicine.fromJson(Map<String, dynamic> json)
       : id = json['_id'] as String?,
+        user = json['user'] as String?,
         name = json['name'] as String?,
         dosage = json['dosage'] as String?,
         frequency = json['frequency'] as int?,
@@ -34,12 +37,13 @@ class Medicine {
         additionalInfo = json['additionalInfo'] as String?,
         doseSchedules = (json['doseSchedules'] as List?)?.map((dynamic e) => DoseSchedules.fromJson(e as Map<String,dynamic>)).toList(),
         timezone = json['timezone'] as String?,
-        price = json['price'] as int?,
+        price = json['price'] as double?,
         currency = json['currency'] as String?,
         v = json['__v'] as int?;
 
   Map<String, dynamic> toJson() => {
     '_id' : id,
+    'user' : user,
     'name' : name,
     'dosage' : dosage,
     'frequency' : frequency,
