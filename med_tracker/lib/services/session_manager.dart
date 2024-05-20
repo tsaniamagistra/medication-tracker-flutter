@@ -17,13 +17,13 @@ class SessionManager {
   }
 
   // Set userId
-  static Future<void> setuserId(String userId) async {
+  static Future<void> setUserId(String userId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userIdKey, userId);
   }
 
   // Get userId
-  static Future<String?> getuserId() async {
+  static Future<String?> getUserId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(_userIdKey);
   }
