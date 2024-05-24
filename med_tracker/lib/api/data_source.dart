@@ -9,8 +9,8 @@ class MedTrackerDataSource {
     return BaseNetwork.post('medicine/', requestBody);
   }
 
-  Future<Map<String, dynamic>> loadMedicines(String user) {
-    return BaseNetwork.get('medicine/$user');
+  Future<List<dynamic>> loadMedicines(String user) {
+    return BaseNetwork.getList('medicine/$user');
   }
 
   Future<Map<String, dynamic>> getMedicineById(String id) {

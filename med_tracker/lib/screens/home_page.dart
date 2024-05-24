@@ -30,8 +30,7 @@ class _HomePageState extends State<HomePage> {
   Future<List<Medicine>> _fetchMedicines() async {
     try {
       String? userId = await SessionManager.getUserId();
-      final response = await MedTrackerDataSource.instance.loadMedicines(userId!);
-      final List<dynamic> medicinesJson = response['medicines'];
+      final List<dynamic> medicinesJson = await MedTrackerDataSource.instance.loadMedicines(userId!);
       return medicinesJson.map((json) => Medicine.fromJson(json)).toList();
     } catch (error) {
       print("Error fetching medicines: $error");

@@ -13,6 +13,14 @@ class BaseNetwork {
     return _processResponse(response);
   }
 
+  static Future<List<dynamic>> getList(String partUrl) async {
+    final String fullUrl = baseUrl + "/" + partUrl;
+    debugPrint("BaseNetwork - fullUrl : $fullUrl");
+    final response = await http.get(Uri.parse(fullUrl));
+    debugPrint("BaseNetwork - response : ${response.body}");
+    return _processListResponse(response);
+  }
+
   static Future<Map<String, dynamic>> post(String partUrl, Map<String, dynamic> body) async {
     final String fullUrl = baseUrl + "/" + partUrl;
     debugPrint("BaseNetwork - fullUrl : $fullUrl");
@@ -54,6 +62,15 @@ class BaseNetwork {
     } else {
       print("processResponse error");
       return {"error": true};
+    }
+  }
+
+  static List<dynamic> _processListResponse(http.Response response) {
+    final body = json.decode(response.body);
+    if (body is List) {
+      return body;
+    } else {
+      throw Exception('Invalid response format: $body');
     }
   }
 
