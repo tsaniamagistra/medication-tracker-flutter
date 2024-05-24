@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:med_tracker/screens/feedback_page.dart';
 import 'package:med_tracker/screens/home_page.dart';
 import 'package:med_tracker/screens/login_page.dart';
+import 'package:med_tracker/screens/logout_page.dart';
 import 'package:med_tracker/screens/profile_page.dart';
 import 'package:med_tracker/services/session_manager.dart';
 
@@ -35,9 +36,10 @@ class MyApp extends StatelessWidget {
         },
       ),
       routes: {
-        '/home': (context) => HomePage(),
         '/profile': (context) => ProfilePage(),
+        '/home': (context) => HomePage(),
         '/feedback': (context) => FeedbackPage(),
+        '/logout': (context) => LogoutPage(),
       },
     );
   }
