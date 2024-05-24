@@ -20,36 +20,15 @@ class SessionManager {
   }
 
   // Set user info
-  static Future<void> setUserInfo(String userId, String name, String email, String profilePicture) async {
+  static Future<void> setUserId(String userId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userIdKey, userId);
-    await prefs.setString(_userNameKey, name);
-    await prefs.setString(_userEmailKey, email);
-    await prefs.setString(_profilePictureKey, profilePicture);
   }
 
   // Get user id
   static Future<String?> getUserId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(_userIdKey);
-  }
-
-  // Get user name
-  static Future<String?> getUserName() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_userNameKey);
-  }
-
-  // Get user email
-  static Future<String?> getUserEmail() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_userEmailKey);
-  }
-
-  // Get profile picture
-  static Future<String?> getProfilePicture() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_profilePictureKey);
   }
 
   // Clear all session data

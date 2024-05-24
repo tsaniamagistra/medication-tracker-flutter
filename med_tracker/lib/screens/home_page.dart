@@ -21,15 +21,19 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _loadUserName() async {
-    String? userName = await SessionManager.getUserName();
-    setState(() {
-      _userName = userName ?? '';
-    });
+    final userId = await SessionManager.getUserId();
+    Map<String, dynamic>? userData = await MedTrackerDataSource.instance.getUserById(userId!);
+    if (userData != null) {
+      setState(() {
+        _userName = userData['name'] ?? '';
+      });
+    }
   }
+
 
   Future<List<Medicine>> _fetchMedicines() async {
     try {
-      String? userId = await SessionManager.getUserId();
+      final userId = await SessionManager.getUserId();
       final List<dynamic> medicinesJson = await MedTrackerDataSource.instance.loadMedicines(userId!);
       return medicinesJson.map((json) => Medicine.fromJson(json)).toList();
     } catch (error) {

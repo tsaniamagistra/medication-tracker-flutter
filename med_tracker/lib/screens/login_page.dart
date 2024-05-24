@@ -102,7 +102,7 @@ Future<bool> checkCredentials(String email, String password) async {
   User user = User.fromJson(await MedTrackerDataSource.instance.getUserByEmail(email));
 
   if (user.password == password) {
-    await SessionManager.setUserInfo(user.id!, user.name!, user.email!, user.profilePicture!);
+    await SessionManager.setUserId(user.id!);
     return true;
   } else {
     return false;

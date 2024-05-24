@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:med_tracker/api/data_source.dart';
 import 'package:med_tracker/services/session_manager.dart';
 import 'package:med_tracker/widgets/bottom_navbar.dart';
 
@@ -21,16 +22,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadUserInfo() async {
     final id = await SessionManager.getUserId();
-    final name = await SessionManager.getUserName();
-    final email = await SessionManager.getUserEmail();
-    final picture = await SessionManager.getProfilePicture();
-    setState(() {
-      userId = id;
-      userName = name;
-      userEmail = email;
-      profilePicture = picture;
-    });
+    Map<String, dynamic>? userData = await MedTrackerDataSource.instance.getUserById(id!);
+    if (userData != null) {
+      setState(() {
+        userId = id;
+        userName = userData['name'] ?? '';
+        userEmail = userData['email'] ?? '';
+        profilePicture = userData['profilePicture'] ?? '';
+      });
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {

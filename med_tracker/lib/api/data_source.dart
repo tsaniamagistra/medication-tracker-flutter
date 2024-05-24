@@ -17,8 +17,8 @@ class MedTrackerDataSource {
     return BaseNetwork.get('medicine/id/$id');
   }
 
-  Future<Map<String, dynamic>> getMedicineByName(String user, name) {
-    return BaseNetwork.get('medicine/name/$user/$name');
+  Future<List<dynamic>> getMedicineByName(String user, name) {
+    return BaseNetwork.getList('medicine/name/$user/$name');
   }
 
   Future<Map<String, dynamic>> updateMedicineById(String id, Map<String, dynamic> requestBody) {
@@ -35,8 +35,12 @@ class MedTrackerDataSource {
     return BaseNetwork.post('user/', requestBody);
   }
 
+  Future<Map<String, dynamic>> getUserById(String id) {
+    return BaseNetwork.get('user/id/$id');
+  }
+
   Future<Map<String, dynamic>> getUserByEmail(String email) {
-    return BaseNetwork.get('user/$email');
+    return BaseNetwork.get('user/email/$email');
   }
 
   Future<Map<String, dynamic>> updateUserById(String id, Map<String, dynamic> requestBody) {
