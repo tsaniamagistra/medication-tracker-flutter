@@ -37,7 +37,7 @@ class Medicine {
         additionalInfo = json['additionalInfo'] as String?,
         doseSchedules = (json['doseSchedules'] as List?)?.map((dynamic e) => DoseSchedules.fromJson(e as Map<String,dynamic>)).toList(),
         timezone = json['timezone'] as String?,
-        price = json['price'] as double?,
+        price = (json['price'] is int) ? (json['price'] as int).toDouble() : json['price'] as double?,
         currency = json['currency'] as String?,
         v = json['__v'] as int?;
 

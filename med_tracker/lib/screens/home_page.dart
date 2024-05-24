@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Halo, $_userName!'),
+        title: Text('Hello, $_userName!'),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
@@ -90,9 +90,51 @@ class _HomePageState extends State<HomePage> {
             // Handle medicine item tap
           },
           child: Card(
-            child: ListTile(
-              title: Text(medicine.name ?? 'No name'),
-              subtitle: Text('Dosage: ${medicine.dosage ?? 'No dosage'}'),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        medicine.name ?? 'No name',
+                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${medicine.frequency}x${medicine.dosage}/${medicine.frequencyType}',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          (medicine.doseSchedules?.map((drinkTime) => drinkTime.time) ?? ['No time']).join(' '),
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                      ),
+                      Text(
+                        medicine.timezone ?? 'No timezone',
+                        style: TextStyle(fontSize: 14.0),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5.0),
+                  Text(
+                    medicine.additionalInfo ?? 'No additional info',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                  SizedBox(height: 5.0),
+                  Text(
+                    'Price: ${medicine.price ?? 'No price'} ${medicine.currency ?? 'No currency'}',
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                ],
+              ),
             ),
           ),
         );
