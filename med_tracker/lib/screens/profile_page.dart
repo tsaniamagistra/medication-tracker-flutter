@@ -1,10 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:med_tracker/services/session_manager.dart';
+import 'package:med_tracker/widgets/bottom_navbar.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+class ProfilePage extends StatefulWidget {
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String? userId;
+  String? userName;
+  String? userEmail;
+  String? profilePicture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final id = await SessionManager.getUserId();
+    final name = await SessionManager.getUserName();
+    final email = await SessionManager.getUserEmail();
+    final picture = await SessionManager.getProfilePicture();
+    setState(() {
+      userId = id;
+      userName = name;
+      userEmail = email;
+      profilePicture = picture;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      bottomNavigationBar: BottomNavBar(selectedIndex: 0),
+      body: Center(
+        child: userId == null ||
+                userName == null ||
+                userEmail == null ||
+                profilePicture == null
+            ? CircularProgressIndicator()
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    profilePicture != null
+                        ? CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(profilePicture!),
+                          )
+                        : CircleAvatar(
+                            radius: 50,
+                            child: Icon(Icons.person, size: 50),
+                          ),
+                    SizedBox(height: 16),
+                    Text(
+                      '$userName',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '$userEmail',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
+              ),
+      ),
+    );
   }
 }

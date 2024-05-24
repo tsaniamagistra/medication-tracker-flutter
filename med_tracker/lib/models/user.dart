@@ -3,6 +3,7 @@ class User {
   final String? email;
   final String? password;
   final String? name;
+  final String? profilePicture;
   final int? v;
 
   User({
@@ -10,6 +11,7 @@ class User {
     this.email,
     this.password,
     this.name,
+    this.profilePicture,
     this.v,
   });
 
@@ -18,13 +20,15 @@ class User {
         email = json['email'] as String?,
         password = json['password'] as String?,
         name = json['name'] as String?,
+        profilePicture = json['profilePicture'] as String?,
         v = json['__v'] as int?;
 
   Map<String, dynamic> toJson() => {
-    '_id' : id,
-    'email' : email,
-    'password' : password,
-    'name' : name,
-    '__v' : v
+    '_id': id,
+    'email': email,
+    'password': password,
+    'name': name,
+    'profilePicture': profilePicture,
+    '__v': v,
   };
 }
