@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(height: 5.0),
                     if (medicine.price != null)
                       Text(
-                        'Price: ${medicine.price}${medicine.currency != null ? ' ${medicine.currency}' : ''}',
+                        'Price: ${medicine.price} ${medicine.currency!.toUpperCase()}',
                         style: TextStyle(fontSize: 16.0),
                       ),
                   ],
@@ -216,7 +216,7 @@ class _HomePageState extends State<HomePage> {
                       IconButton(
                         icon: Icon(Icons.edit, color: Colors.grey),
                         onPressed: () {
-                          _editMedicine(medicine.id!);
+                          _editMedicine(medicine.id!, medicine.name!);
                         },
                       ),
                     ],
@@ -230,7 +230,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _editMedicine(String medicineId) async {
+  Future<void> _editMedicine(String medicineId, String medicineName) async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -251,7 +251,7 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ConvertPricePage(medicineId: medicineId)),
+                    MaterialPageRoute(builder: (context) => ConvertPricePage(medicineId: medicineId, medicineName: medicineName)),
                   );
                 },
                 child: Text('Convert Price'),

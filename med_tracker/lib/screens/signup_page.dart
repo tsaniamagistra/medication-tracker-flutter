@@ -4,7 +4,7 @@ import 'package:med_tracker/screens/login_page.dart';
 import 'package:med_tracker/api/data_source.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+  const SignupPage({Key? key}) : super(key: key);
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -18,65 +18,67 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-          body: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _nameField(),
-                _emailField(),
-                _passwordField(),
-                _signupButton(context),
-              ],
-            ),
-          )
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Signup'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _nameField(),
+            SizedBox(height: 20),
+            _emailField(),
+            SizedBox(height: 20),
+            _passwordField(),
+            SizedBox(height: 20),
+            _signupButton(context),
+          ],
+        ),
       ),
     );
   }
 
   Widget _nameField() {
-    return Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: TextFormField(
-          onChanged: (value) => name = value,
-          decoration: InputDecoration(
-            labelText: 'Email',
-          ),
-        ));
+    return TextFormField(
+      onChanged: (value) => name = value,
+      decoration: InputDecoration(
+        labelText: 'Name',
+        border: OutlineInputBorder(),
+      ),
+    );
   }
 
   Widget _emailField() {
-    return Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: TextFormField(
-          onChanged: (value) => email = value,
-          decoration: InputDecoration(
-            labelText: 'Email',
-          ),
-        ));
+    return TextFormField(
+      onChanged: (value) => email = value,
+      decoration: InputDecoration(
+        labelText: 'Email',
+        border: OutlineInputBorder(),
+      ),
+    );
   }
 
   Widget _passwordField() {
-    return Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: TextFormField(
-          onChanged: (value) => password = value,
-          obscureText: false,
-          decoration: InputDecoration(
-            labelText: 'Password',
-          ),
-        ));
+    return TextFormField(
+      onChanged: (value) => password = value,
+      obscureText: true,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        border: OutlineInputBorder(),
+      ),
+    );
   }
 
   Widget _signupButton(context) {
     return ElevatedButton(
       onPressed: () async {
         String text = "";
-        if (await checkCredentials(email, password)) {
+        if (await signupNewUser(email, password, name)) {
           setState(() {
-            text = "Login Berhasil. Silakan Login";
+            text = "Signup is successful. Please login";
             isSignupSuccess = true;
           });
           Navigator.pushReplacement(
@@ -85,20 +87,20 @@ class _SignupPageState extends State<SignupPage> {
           );
         } else {
           setState(() {
-            text = "Login Gagal";
+            text = "Signup failed";
             isSignupSuccess = false;
           });
         }
 
-        SnackBar snackBar = SnackBar(
-          content: Text(text),
-          backgroundColor: (isSignupSuccess) ? Colors.green : Colors.red,
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(text),
+            backgroundColor: (isSignupSuccess) ? Colors.green : Colors.red,
+          ),
         );
-
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       },
       child: Text(
-        'Login',
+        'Signup',
         style: TextStyle(fontSize: 16.0),
       ),
     );
@@ -116,12 +118,8 @@ Future<bool> signupNewUser(String email, String password, String name) async {
     'name': name,
   };
 
-  User user = User.fromJson(await MedTrackerDataSource.instance.createUser(requestBody));
+  User user = User.fromJson(
+      await MedTrackerDataSource.instance.createUser(requestBody));
 
-  if (user.email != null && user.password != null) {
-    return true;
-  } else {
-    return false;
-  }
+  return (user.email != null && user.password != null);
 }
-

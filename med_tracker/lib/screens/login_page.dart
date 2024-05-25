@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:med_tracker/models/user.dart';
 import 'package:med_tracker/screens/home_page.dart';
+import 'package:med_tracker/screens/signup_page.dart';
 import 'package:med_tracker/services/session_manager.dart';
 import 'package:med_tracker/api/data_source.dart';
 
@@ -20,17 +21,20 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          body: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _emailField(),
-                _passwordField(),
-                _loginButton(context),
-              ],
-            ),
-          )
+        body: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _emailField(),
+              _passwordField(),
+              SizedBox(height: 10),
+              _signupOption(context),
+              SizedBox(height: 10),
+              _loginButton(context),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -89,6 +93,25 @@ class _LoginPageState extends State<LoginPage> {
       child: Text(
         'Login',
         style: TextStyle(fontSize: 16.0),
+      ),
+    );
+  }
+
+  Widget _signupOption(context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SignupPage()),
+        );
+      },
+      child: Text(
+        'Don\'t have an account? Sign Up',
+        style: TextStyle(
+          color: Colors.blue,
+          fontSize: 14,
+          decoration: TextDecoration.underline,
+        ),
       ),
     );
   }

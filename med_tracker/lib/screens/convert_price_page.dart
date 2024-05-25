@@ -5,8 +5,9 @@ import 'package:med_tracker/models/exchange_rates.dart';
 
 class ConvertPricePage extends StatefulWidget {
   final String medicineId;
+  final String medicineName;
 
-  ConvertPricePage({required this.medicineId});
+  ConvertPricePage({required this.medicineId, required this.medicineName});
 
   @override
   _ConvertPricePageState createState() => _ConvertPricePageState();
@@ -15,7 +16,7 @@ class ConvertPricePage extends StatefulWidget {
 class _ConvertPricePageState extends State<ConvertPricePage> {
   late Future<Map<String, dynamic>> _medicineFuture;
   Map<String, double> _exchangeRates = {};
-  String _destinationCurrency = 'idr';
+  String _destinationCurrency = 'IDR';
   Medicine? _medicine;
   double? _convertedPrice;
 
@@ -34,7 +35,8 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
 
   Future<void> _loadExchangeRates(String baseCurrency) async {
     try {
-      final exchangeRates = await ExchangeDataSource.instance.getExchangeRate(baseCurrency);
+      final exchangeRates =
+      await ExchangeDataSource.instance.getExchangeRate(baseCurrency);
       setState(() {
         _exchangeRates = {};
         exchangeRates[baseCurrency].forEach((key, value) {
@@ -51,7 +53,7 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
   }
 
   double _convertPrice(double price) {
-    final exchangeRate = _exchangeRates[_destinationCurrency];
+    final exchangeRate = _exchangeRates[_destinationCurrency.toLowerCase()];
     print(
         'Price: $price, Exchange Rate: $exchangeRate, Destination Currency: $_destinationCurrency');
     if (exchangeRate != null) {
@@ -68,7 +70,7 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Convert Price of Medicine'),
+        title: Text('Convert Price of ${widget.medicineName}'),
       ),
       body: Center(
         child: FutureBuilder<Map<String, dynamic>>(
@@ -81,46 +83,59 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
             } else if (snapshot.hasData) {
               final medicine = snapshot.data!;
               _medicine = Medicine.fromJson(medicine);
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Price: ${medicine['price']} ${medicine['currency']}'),
-                  DropdownButton<String>(
-                    value: _destinationCurrency,
-                    items: ['idr', 'usd', 'myr']
-                        .map((currency) => DropdownMenuItem<String>(
-                      value: currency,
-                      child: Text(currency.toUpperCase()),
-                    ))
-                        .toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        _destinationCurrency = newValue!;
-                      });
-                    },
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (medicine['price'] != null) {
-                        final convertedPrice =
-                        _convertPrice(medicine['price'].toDouble());
-                        setState(() {
-                          _convertedPrice = convertedPrice;
-                        });
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text(
-                                  'Price information not available')),
-                        );
-                      }
-                    },
-                    child: Text('Convert Price'),
-                  ),
-                  if (_convertedPrice != null)
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
                     Text(
-                        '$_convertedPrice $_destinationCurrency'),
-                ],
+                      'Price: ${medicine['price']} ${medicine['currency'].toUpperCase()}',
+                      style: TextStyle(fontSize: 18.0),
+                    ),
+                    SizedBox(height: 14.0),
+                    DropdownButton<String>(
+                      value: _destinationCurrency,
+                      items: ['IDR', 'USD', 'MYR']
+                          .map((currency) => DropdownMenuItem<String>(
+                        value: currency,
+                        child: Text(currency),
+                      ))
+                          .toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _destinationCurrency = newValue!;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 10.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (medicine['price'] != null) {
+                          final convertedPrice =
+                          _convertPrice(medicine['price'].toDouble());
+                          setState(() {
+                            _convertedPrice = convertedPrice;
+                          });
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                              Text('Price information not available'),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text('Convert Price'),
+                    ),
+                    SizedBox(height: 20.0),
+                    if (_convertedPrice != null)
+                      Text(
+                        '$_convertedPrice',
+                        style: TextStyle(fontSize: 20.0),
+                      ),
+                  ],
+                ),
               );
             } else {
               return Text('No data available');
