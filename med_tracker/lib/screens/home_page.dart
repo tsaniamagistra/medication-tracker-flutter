@@ -47,22 +47,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _deleteMedicine(String medicineId) async {
-    try {
-      await MedTrackerDataSource.instance.deleteMedicineById(medicineId);
-      setState(() {
-        _medicinesList = _fetchMedicines();
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Medicine deleted successfully!'), backgroundColor: Colors.green,),
-      );
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete medicine!'), backgroundColor: Colors.red),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -220,11 +204,21 @@ class _HomePageState extends State<HomePage> {
                 Positioned(
                   bottom: 0,
                   right: 0,
-                  child: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.grey),
-                    onPressed: () {
-                      _deleteMedicine(medicine.id!);
-                    },
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.grey),
+                        onPressed: () {
+                          _deleteMedicine(medicine.id!, medicine.name!);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit, color: Colors.grey),
+                        onPressed: () {
+                          _editMedicine(medicine.id!);
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -233,5 +227,94 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+  }
+
+  Future<void> _editMedicine(String medicineId) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  /*Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => EditMedicinePage(medicineId: medicineId)),
+                  );*/
+                },
+                child: Text('Edit Medicine Details'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  /*Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ConvertPricePage(medicineId: medicineId)),
+                  );*/
+                },
+                child: Text('Convert Price'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  /*Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ConvertTimePage(medicineId: medicineId)),
+                  );*/
+                },
+                child: Text('Convert Time'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteMedicine(String medicineId, String medicineName) async {
+    try {
+      bool confirmDelete = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Delete $medicineName'),
+            content: Text('Do you want to delete this medicine?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: Text('Delete'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirmDelete == true) {
+        await MedTrackerDataSource.instance.deleteMedicineById(medicineId);
+        setState(() {
+          _medicinesList = _fetchMedicines();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Medicine $medicineName deleted successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Failed to delete medicine!'),
+            backgroundColor: Colors.red),
+      );
+    }
   }
 }

@@ -6,48 +6,58 @@ class MedTrackerDataSource {
   // medicine
 
   Future<Map<String, dynamic>> createMedicine(Map<String, dynamic> requestBody) {
-    return BaseNetwork.post('medicine/', requestBody);
+    return MedTrackerBaseNetwork.post('medicine/', requestBody);
   }
 
   Future<List<dynamic>> loadMedicines(String user) {
-    return BaseNetwork.getList('medicine/$user');
+    return MedTrackerBaseNetwork.getList('medicine/$user');
   }
 
   Future<Map<String, dynamic>> getMedicineById(String id) {
-    return BaseNetwork.get('medicine/id/$id');
+    return MedTrackerBaseNetwork.get('medicine/id/$id');
   }
 
   Future<List<dynamic>> getMedicineByName(String user, name) {
-    return BaseNetwork.getList('medicine/name/$user/$name');
+    return MedTrackerBaseNetwork.getList('medicine/name/$user/$name');
   }
 
   Future<Map<String, dynamic>> updateMedicineById(String id, Map<String, dynamic> requestBody) {
-    return BaseNetwork.put('medicine/$id', requestBody);
+    return MedTrackerBaseNetwork.put('medicine/$id', requestBody);
   }
 
   Future<Map<String, dynamic>> deleteMedicineById(String id) {
-    return BaseNetwork.delete('medicine/$id');
+    return MedTrackerBaseNetwork.delete('medicine/$id');
   }
 
   // user
 
   Future<Map<String, dynamic>> createUser(Map<String, dynamic> requestBody) {
-    return BaseNetwork.post('user/', requestBody);
+    return MedTrackerBaseNetwork.post('user/', requestBody);
   }
 
   Future<Map<String, dynamic>> getUserById(String id) {
-    return BaseNetwork.get('user/id/$id');
+    return MedTrackerBaseNetwork.get('user/id/$id');
   }
 
   Future<Map<String, dynamic>> getUserByEmail(String email) {
-    return BaseNetwork.get('user/email/$email');
+    return MedTrackerBaseNetwork.get('user/email/$email');
   }
 
   Future<Map<String, dynamic>> updateUserById(String id, Map<String, dynamic> requestBody) {
-    return BaseNetwork.put('user/$id', requestBody);
+    return MedTrackerBaseNetwork.put('user/$id', requestBody);
   }
 
   Future<Map<String, dynamic>> deleteUserById(String id) {
-    return BaseNetwork.delete('user/$id');
+    return MedTrackerBaseNetwork.delete('user/$id');
+  }
+}
+
+class ExchangeDataSource {
+  Future<Map<String, dynamic>> getExchangeRate(String currency) {
+    return MedTrackerBaseNetwork.get('currencies/$currency.json');
+  }
+
+  Future<Map<String, dynamic>> getCurrencies() {
+    return MedTrackerBaseNetwork.get('currencies.json');
   }
 }
