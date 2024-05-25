@@ -13,6 +13,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late Future<List<Medicine>> _medicinesList;
   late String _userName = '';
+  String _searchQuery = '';
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -27,16 +29,37 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _userName = userData['name'] ?? '';
     });
-    }
+  }
 
   Future<List<Medicine>> _fetchMedicines() async {
     try {
       final userId = await SessionManager.getUserId();
-      final List<dynamic> medicinesJson = await MedTrackerDataSource.instance.loadMedicines(userId!);
-      return medicinesJson.map((json) => Medicine.fromJson(json)).toList();
+      if (_isSearching && _searchQuery.isNotEmpty) {
+        final List<dynamic> medicinesJson = await MedTrackerDataSource.instance.getMedicineByName(userId!, _searchQuery);
+        return medicinesJson.map((json) => Medicine.fromJson(json)).toList();
+      } else {
+        final List<dynamic> medicinesJson = await MedTrackerDataSource.instance.loadMedicines(userId!);
+        return medicinesJson.map((json) => Medicine.fromJson(json)).toList();
+      }
     } catch (error) {
       print("Error fetching medicines: $error");
       return [];
+    }
+  }
+
+  Future<void> _deleteMedicine(String medicineId) async {
+    try {
+      await MedTrackerDataSource.instance.deleteMedicineById(medicineId);
+      setState(() {
+        _medicinesList = _fetchMedicines();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Medicine deleted successfully!'), backgroundColor: Colors.green,),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete medicine!'), backgroundColor: Colors.red),
+      );
     }
   }
 
@@ -44,36 +67,77 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: Text('Hello, $_userName!'),
-        actions: [
+        automaticallyImplyLeading: false,
+      ),
+      bottomNavigationBar: BottomNavBar(selectedIndex: 1),
+      body: Column(
+        children: [
+          _buildActionsBody(),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+              child: _buildMedicinesBody(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionsBody() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search...',
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                  suffixIcon: Icon(Icons.search),
+                ),
+                onChanged: (query) {
+                  setState(() {
+                    _searchQuery = query;
+                    _isSearching = query.isNotEmpty;
+                    _medicinesList = _fetchMedicines();
+                  });
+                },
+              ),
+            ),
+          ),
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
               setState(() {
+                _searchQuery = '';
+                _isSearching = false;
                 _medicinesList = _fetchMedicines();
               });
             },
           ),
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddMedicinePage()),
+              ).then((_) {
+                setState(() {
+                  _medicinesList = _fetchMedicines();
+                });
+              });
+            },
+          ),
         ],
-      ),
-      bottomNavigationBar: BottomNavBar(selectedIndex: 1),
-      body: Padding(
-        padding: EdgeInsets.all(10.0),
-        child: _buildMedicinesBody(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddMedicinePage()),
-          ).then((_) {
-            setState(() {
-              _medicinesList = _fetchMedicines();
-            });
-          });
-        },
-        child: Icon(Icons.add),
       ),
     );
   }
@@ -101,56 +165,69 @@ class _HomePageState extends State<HomePage> {
       itemCount: medicines.length,
       itemBuilder: (context, index) {
         final medicine = medicines[index];
-        return InkWell(
-          onTap: () {
-            // Handle medicine item tap
-          },
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        medicine.name ?? 'No name',
-                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        '${medicine.frequency}x${medicine.dosage}/${medicine.frequencyType}',
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5.0),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          (medicine.doseSchedules?.map((drinkTime) => drinkTime.time) ?? ['No time']).join(' '),
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Stack(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          medicine.name ?? 'No name',
+                          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${medicine.frequency}x${medicine.dosage}/${medicine.frequencyType}',
                           style: TextStyle(fontSize: 16.0),
                         ),
-                      ),
+                      ],
+                    ),
+                    SizedBox(height: 5.0),
+                    Row(
+                      children: [
+                        if (medicine.doseSchedules != null)
+                          Expanded(
+                            child: Text(
+                              medicine.doseSchedules!.map((drinkTime) => drinkTime.time).join(' '),
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                          ),
+                        if (medicine.timezone != null)
+                          Text(
+                            medicine.timezone!,
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: 5.0),
+                    if (medicine.additionalInfo != null)
                       Text(
-                        medicine.timezone ?? 'No timezone',
-                        style: TextStyle(fontSize: 14.0),
+                        medicine.additionalInfo!,
+                        style: TextStyle(fontSize: 16.0),
                       ),
-                    ],
+                    SizedBox(height: 5.0),
+                    if (medicine.price != null)
+                      Text(
+                        'Price: ${medicine.price}${medicine.currency != null ? ' ${medicine.currency}' : ''}',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                  ],
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.grey),
+                    onPressed: () {
+                      _deleteMedicine(medicine.id!);
+                    },
                   ),
-                  SizedBox(height: 5.0),
-                  Text(
-                    medicine.additionalInfo ?? 'No additional info',
-                    style: TextStyle(fontSize: 16.0),
-                  ),
-                  SizedBox(height: 5.0),
-                  Text(
-                    'Price: ${medicine.price ?? 'No price'} ${medicine.currency ?? 'No currency'}',
-                    style: TextStyle(fontSize: 16.0),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
