@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:med_tracker/api/data_source.dart';
 import 'package:med_tracker/services/session_manager.dart';
 import 'package:med_tracker/widgets/bottom_navbar.dart';
+import 'dart:math';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -33,11 +34,15 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavBar(selectedIndex: 0),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){},
+        tooltip: 'Edit Profile',
+        child: Icon(Icons.edit),
+      ),
       body: Center(
         child: userId == null ||
                 userName == null ||
@@ -52,7 +57,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     profilePicture != null
                         ? CircleAvatar(
                             radius: 50,
-                            backgroundImage: NetworkImage(profilePicture!),
+                            // parameter acak pada URL utk menghindari caching gambar di sisi klien
+                            backgroundImage: NetworkImage('$profilePicture?timestamp=${Random().nextInt(10000)}'),
                           )
                         : CircleAvatar(
                             radius: 50,
