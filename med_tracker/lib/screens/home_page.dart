@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:med_tracker/api/data_source.dart';
 import 'package:med_tracker/models/medicine.dart';
+import 'package:med_tracker/screens/add_med_page.dart';
 import 'package:med_tracker/services/session_manager.dart';
 import 'package:med_tracker/widgets/bottom_navbar.dart';
 
@@ -23,13 +24,10 @@ class _HomePageState extends State<HomePage> {
   void _loadUserName() async {
     final userId = await SessionManager.getUserId();
     Map<String, dynamic>? userData = await MedTrackerDataSource.instance.getUserById(userId!);
-    if (userData != null) {
-      setState(() {
-        _userName = userData['name'] ?? '';
-      });
+    setState(() {
+      _userName = userData['name'] ?? '';
+    });
     }
-  }
-
 
   Future<List<Medicine>> _fetchMedicines() async {
     try {
@@ -63,6 +61,19 @@ class _HomePageState extends State<HomePage> {
       body: Padding(
         padding: EdgeInsets.all(10.0),
         child: _buildMedicinesBody(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddMedicinePage()),
+          ).then((_) {
+            setState(() {
+              _medicinesList = _fetchMedicines();
+            });
+          });
+        },
+        child: Icon(Icons.add),
       ),
     );
   }

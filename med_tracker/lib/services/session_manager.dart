@@ -3,9 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SessionManager {
   static final String _isLoggedInKey = 'isLoggedIn';
   static final String _userIdKey = 'userId';
-  static final String _userNameKey = 'name';
-  static final String _userEmailKey = 'email';
-  static final String _profilePictureKey = 'profilePicture';
 
   // Set login status
   static Future<void> setLoggedIn(bool isLoggedIn) async {

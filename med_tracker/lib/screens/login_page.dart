@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
         if (await checkCredentials(email, password)) {
           await SessionManager.setLoggedIn(true);
           setState(() {
-            text = "Login Berhasil";
+            text = "Login Success";
             isLoginSuccess = true;
           });
           Navigator.pushReplacement(
@@ -74,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
           );
         } else {
           setState(() {
-            text = "Login Gagal";
+            text = "Login Failed";
             isLoginSuccess = false;
           });
         }
