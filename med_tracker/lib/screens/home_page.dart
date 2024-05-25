@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:med_tracker/api/data_source.dart';
 import 'package:med_tracker/models/medicine.dart';
 import 'package:med_tracker/screens/add_med_page.dart';
+import 'package:med_tracker/screens/convert_price_page.dart';
 import 'package:med_tracker/services/session_manager.dart';
 import 'package:med_tracker/widgets/bottom_navbar.dart';
 
@@ -165,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          '${medicine.frequency}x${medicine.dosage}/${medicine.frequencyType}',
+                          '${medicine.frequency} x ${medicine.dosage} / ${medicine.frequencyType}',
                           style: TextStyle(fontSize: 16.0),
                         ),
                       ],
@@ -248,10 +249,10 @@ class _HomePageState extends State<HomePage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  /*Navigator.push(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => ConvertPricePage(medicineId: medicineId)),
-                  );*/
+                  );
                 },
                 child: Text('Convert Price'),
               ),

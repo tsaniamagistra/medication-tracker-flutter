@@ -19,7 +19,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
   final TextEditingController _priceController = TextEditingController();
 
   String? _selectedFrequencyType;
-  List<String> _frequencyTypes = ['day', 'week', 'month', 'year'];
+  List<String> _frequencyTypes = ['Day', 'Week', 'Month', 'Year'];
 
   String? _selectedCurrency;
   List<String> _currencies = ['idr', 'usd', 'myr'];
@@ -135,7 +135,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text(value),
+                          child: Text(value.toUpperCase()),
                         );
                       }).toList()),
                 ],

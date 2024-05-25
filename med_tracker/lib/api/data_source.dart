@@ -53,11 +53,13 @@ class MedTrackerDataSource {
 }
 
 class ExchangeDataSource {
-  Future<Map<String, dynamic>> getExchangeRate(String currency) {
-    return MedTrackerBaseNetwork.get('currencies/$currency.json');
+  static ExchangeDataSource instance = ExchangeDataSource();
+
+  Future<Map<String, dynamic>> getExchangeRate(String baseCurrency) {
+    return ExchangeBaseNetwork.get('currencies/$baseCurrency.json');
   }
 
   Future<Map<String, dynamic>> getCurrencies() {
-    return MedTrackerBaseNetwork.get('currencies.json');
+    return ExchangeBaseNetwork.get('currencies.json');
   }
 }

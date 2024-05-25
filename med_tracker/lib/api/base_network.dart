@@ -79,9 +79,9 @@ class MedTrackerBaseNetwork {
   }
 }
 
-class ExchangeBaseNetwrok {
+class ExchangeBaseNetwork {
   static final String baseUrl =
-      'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/';
+      'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1';
 
   static Future<Map<String, dynamic>> get(String partUrl) async {
     final String fullUrl = baseUrl + "/" + partUrl;
