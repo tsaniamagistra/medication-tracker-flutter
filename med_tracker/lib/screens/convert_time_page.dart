@@ -132,7 +132,7 @@ class _ConvertTimePageState extends State<ConvertTimePage> {
                       ))
                           .toList(),
                     ),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 14.0),
                     DropdownButton<String>(
                       value: _selectedTimezone,
                       items: _timezones.map((timezone) {
@@ -147,7 +147,7 @@ class _ConvertTimePageState extends State<ConvertTimePage> {
                         });
                       },
                     ),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
                     ElevatedButton(
                       onPressed: () => _convertDoseTimes(medicine),
                       child: Text('Convert Times'),

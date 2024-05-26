@@ -108,7 +108,7 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
                   children: [
                     Text(
                       'Price: ${medicine['price']} ${medicine['currency'].toUpperCase()}',
-                      style: TextStyle(fontSize: 18.0),
+                      style: TextStyle(fontSize: 20.0),
                     ),
                     SizedBox(height: 14.0),
                     DropdownButton<String>(
