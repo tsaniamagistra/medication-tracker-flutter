@@ -74,7 +74,12 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
       print('Converted Price: $convertedPrice');
       return convertedPrice;
     } else {
-      print('Exchange rate not available, returning original price.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Exchange rate not available, returning original price.'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return price.toDouble();
     }
   }
