@@ -124,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
             );
           } else {
             setState(() {
-              text = "Invalid email or password";
+              text = "Incorrect email or password";
               isLoginSuccess = false;
             });
           }

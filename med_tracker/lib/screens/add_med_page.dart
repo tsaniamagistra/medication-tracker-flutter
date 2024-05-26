@@ -166,8 +166,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                     child: TextFormField(
                       controller: _priceController,
                       decoration: InputDecoration(labelText: 'Price'),
-                      keyboardType:
-                      TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
                             RegExp(r'^\d+\.?\d{0,2}')),
@@ -235,9 +234,18 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
     String dosage = _dosageController.text.trim();
     int? frequency = int.tryParse(_frequencyController.text.trim());
     String? frequencyType = _selectedFrequencyType ?? _frequencyTypes.first;
-    double? price = double.tryParse(_priceController.text.trim());
-    String? currency = _selectedCurrency ?? _currencies.first;
+    double? price = _priceController.text.trim().isNotEmpty ? double.tryParse(_priceController.text.trim()) : null;
+    String? currency = _priceController.text.trim().isNotEmpty ? _selectedCurrency : null;
     String additionalInfo = _additionalInfoController.text.trim();
+
+    List<DoseSchedules> doseSchedules = [];
+    String? timezone;
+
+    if (_selectedTime != null) {
+      String formattedTime = '${_selectedTime!.hour}:${_selectedTime!.minute}';
+      doseSchedules = [DoseSchedules(time: formattedTime)];
+      timezone = _selectedTimezone;
+    }
 
     if (userId != null) {
       Medicine newMedicine = Medicine(
@@ -248,13 +256,12 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
         frequencyType: frequencyType,
         additionalInfo: additionalInfo,
         price: price,
-        currency: currency.toLowerCase(),
-        timezone: _selectedTimezone, // Set timezone here
+        currency: currency?.toLowerCase(),
+        timezone: timezone,
+        doseSchedules: doseSchedules.isNotEmpty ? doseSchedules : null,
       );
 
-      MedTrackerDataSource.instance
-          .createMedicine(newMedicine.toJson())
-          .then((response) {
+      MedTrackerDataSource.instance.createMedicine(newMedicine.toJson()).then((response) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Medicine added successfully!'),
