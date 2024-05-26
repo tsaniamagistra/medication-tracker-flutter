@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:med_tracker/api/data_source.dart';
 import 'package:med_tracker/models/currency_list.dart';
+import 'package:med_tracker/screens/home_page.dart';
 
 class ConvertPricePage extends StatefulWidget {
   final String medicineId;
@@ -25,8 +26,22 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
   }
 
   Future<Map<String, dynamic>> _loadMedicineDetails() async {
-    Map<String, dynamic> medicine =
-        await MedTrackerDataSource.instance.getMedicineById(widget.medicineId);
+    Map<String, dynamic> medicine = await MedTrackerDataSource.instance.getMedicineById(widget.medicineId);
+
+    if (medicine['price'] == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Selected medicine doesn\'t have any price'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+      throw Exception('Selected medicine doesn\'t have any price');
+    }
+
     await _loadExchangeRates(medicine['currency'] ?? 'idr');
     return medicine;
   }
@@ -109,19 +124,11 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
                     SizedBox(height: 10.0),
                     ElevatedButton(
                       onPressed: () {
-                        if (medicine['price'] != null) {
-                          final convertedPrice =
-                              _convertPrice(medicine['price'].toDouble());
-                          setState(() {
-                            _convertedPrice = convertedPrice;
-                          });
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Price information not available'),
-                            ),
-                          );
-                        }
+                        final convertedPrice =
+                            _convertPrice(medicine['price'].toDouble());
+                        setState(() {
+                          _convertedPrice = convertedPrice;
+                        });
                       },
                       child: Text('Convert Price'),
                     ),

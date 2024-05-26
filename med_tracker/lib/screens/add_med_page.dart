@@ -175,10 +175,6 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                       controller: _priceController,
                       decoration: InputDecoration(labelText: 'Price'),
                       keyboardType: TextInputType.numberWithOptions(decimal: true),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                            RegExp(r'^\d+\.?\d{0,2}')),
-                      ],
                     ),
                   ),
                   SizedBox(width: 16.0),
