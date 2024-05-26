@@ -4,6 +4,7 @@ import 'package:med_tracker/api/data_source.dart';
 import 'package:med_tracker/models/medicine.dart';
 import 'package:med_tracker/screens/home_page.dart';
 import 'package:med_tracker/services/session_manager.dart';
+import 'package:med_tracker/services/currency_list.dart';
 
 class AddMedicinePage extends StatefulWidget {
   @override
@@ -15,14 +16,16 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dosageController = TextEditingController();
   final TextEditingController _frequencyController = TextEditingController();
-  final TextEditingController _additionalInfoController = TextEditingController();
+  final TextEditingController _additionalInfoController =
+  TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  TimeOfDay? _selectedTime;
 
   String? _selectedFrequencyType;
   List<String> _frequencyTypes = ['Day', 'Week', 'Month', 'Year'];
 
   String? _selectedCurrency;
-  List<String> _currencies = ['idr', 'usd', 'myr'];
+  List<String> _currencies = currencyList.map((currency) => currency.toLowerCase()).toList(); // Use currency list and convert to lowercase
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +101,16 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                 ],
               ),
               SizedBox(height: 16.0),
+              ListTile(
+                title: Text(
+                  _selectedTime == null
+                      ? 'Select Dose Time'
+                      : 'Dose Time: ${_selectedTime!.format(context)}',
+                ),
+                trailing: Icon(Icons.timer),
+                onTap: _pickTime,
+              ),
+              SizedBox(height: 16.0),
               TextFormField(
                 controller: _additionalInfoController,
                 decoration: InputDecoration(labelText: 'Additional Info'),
@@ -125,6 +138,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                   ),
                   SizedBox(width: 16.0),
                   DropdownButton<String>(
+                      menuMaxHeight: 250,
                       value: _selectedCurrency ?? _currencies.first,
                       onChanged: (String? value) {
                         setState(() {
@@ -160,6 +174,18 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
     );
   }
 
+  Future<void> _pickTime() async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (pickedTime != null) {
+      setState(() {
+        _selectedTime = pickedTime;
+      });
+    }
+  }
+
   Future<void> _addMedicine() async {
     String? userId = await SessionManager.getUserId();
     String name = _nameController.text.trim();
@@ -179,7 +205,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
         frequencyType: frequencyType,
         additionalInfo: additionalInfo,
         price: price,
-        currency: currency,
+        currency: currency.toLowerCase(),
       );
 
       MedTrackerDataSource.instance

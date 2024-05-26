@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:med_tracker/api/data_source.dart';
-import 'package:med_tracker/models/medicine.dart';
-import 'package:med_tracker/models/exchange_rates.dart';
+import 'package:med_tracker/services/currency_list.dart';
 
 class ConvertPricePage extends StatefulWidget {
   final String medicineId;
@@ -17,7 +16,6 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
   late Future<Map<String, dynamic>> _medicineFuture;
   Map<String, double> _exchangeRates = {};
   String _destinationCurrency = 'IDR';
-  Medicine? _medicine;
   double? _convertedPrice;
 
   @override
@@ -28,7 +26,7 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
 
   Future<Map<String, dynamic>> _loadMedicineDetails() async {
     Map<String, dynamic> medicine =
-    await MedTrackerDataSource.instance.getMedicineById(widget.medicineId);
+        await MedTrackerDataSource.instance.getMedicineById(widget.medicineId);
     await _loadExchangeRates(medicine['currency'] ?? 'idr');
     return medicine;
   }
@@ -36,7 +34,7 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
   Future<void> _loadExchangeRates(String baseCurrency) async {
     try {
       final exchangeRates =
-      await ExchangeDataSource.instance.getExchangeRate(baseCurrency);
+          await ExchangeDataSource.instance.getExchangeRate(baseCurrency);
       setState(() {
         _exchangeRates = {};
         exchangeRates[baseCurrency].forEach((key, value) {
@@ -82,7 +80,6 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.hasData) {
               final medicine = snapshot.data!;
-              _medicine = Medicine.fromJson(medicine);
               return Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -95,13 +92,14 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
                     ),
                     SizedBox(height: 14.0),
                     DropdownButton<String>(
+                      menuMaxHeight: 250,
                       value: _destinationCurrency,
-                      items: ['IDR', 'USD', 'MYR']
-                          .map((currency) => DropdownMenuItem<String>(
-                        value: currency,
-                        child: Text(currency),
-                      ))
-                          .toList(),
+                      items: currencyList.map((currency) {
+                        return DropdownMenuItem<String>(
+                          value: currency,
+                          child: Text(currency),
+                        );
+                      }).toList(),
                       onChanged: (newValue) {
                         setState(() {
                           _destinationCurrency = newValue!;
@@ -113,15 +111,14 @@ class _ConvertPricePageState extends State<ConvertPricePage> {
                       onPressed: () {
                         if (medicine['price'] != null) {
                           final convertedPrice =
-                          _convertPrice(medicine['price'].toDouble());
+                              _convertPrice(medicine['price'].toDouble());
                           setState(() {
                             _convertedPrice = convertedPrice;
                           });
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content:
-                              Text('Price information not available'),
+                              content: Text('Price information not available'),
                             ),
                           );
                         }
