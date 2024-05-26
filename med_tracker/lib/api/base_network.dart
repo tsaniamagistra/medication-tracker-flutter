@@ -113,7 +113,7 @@ class ExchangeBaseNetwork {
 class TimeAPIBaseNetwork {
   static final String baseUrl = 'https://timeapi.io/api';
 
-  static Future<List> getList(String partUrl) async {
+  static Future<List<String>> getList(String partUrl) async {
     final String fullUrl = baseUrl + "/" + partUrl;
     debugPrint("BaseNetwork - fullUrl : $fullUrl");
     final response = await http.get(Uri.parse(fullUrl));
@@ -143,10 +143,10 @@ class TimeAPIBaseNetwork {
     }
   }
 
-  static List<dynamic> _processListResponse(http.Response response) {
+  static List<String> _processListResponse(http.Response response) {
     final body = json.decode(response.body);
     if (body is List) {
-      return body;
+      return body.cast<String>();
     } else {
       throw Exception('Invalid response format: $body');
     }

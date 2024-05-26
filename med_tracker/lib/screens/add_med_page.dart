@@ -4,7 +4,7 @@ import 'package:med_tracker/api/data_source.dart';
 import 'package:med_tracker/models/medicine.dart';
 import 'package:med_tracker/screens/home_page.dart';
 import 'package:med_tracker/services/session_manager.dart';
-import 'package:med_tracker/services/currency_list.dart';
+import 'package:med_tracker/models/currency_list.dart';
 
 class AddMedicinePage extends StatefulWidget {
   @override
@@ -16,16 +16,33 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dosageController = TextEditingController();
   final TextEditingController _frequencyController = TextEditingController();
-  final TextEditingController _additionalInfoController =
-  TextEditingController();
+  final TextEditingController _additionalInfoController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   TimeOfDay? _selectedTime;
-
   String? _selectedFrequencyType;
   List<String> _frequencyTypes = ['Day', 'Week', 'Month', 'Year'];
-
   String? _selectedCurrency;
-  List<String> _currencies = currencyList.map((currency) => currency.toLowerCase()).toList(); // Use currency list and convert to lowercase
+  List<String> _currencies = currencyList.map((currency) => currency.toLowerCase()).toList();
+  String? _selectedTimezone;
+  List<String> _timezones = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTimezones();
+  }
+
+  Future<void> _loadTimezones() async {
+    try {
+      List<String> timezones = await TimeAPIDataSource.instance.loadTimezones();
+      setState(() {
+        _timezones = timezones;
+        _selectedTimezone = timezones.isNotEmpty ? timezones.first : null;
+      });
+    } catch (e) {
+      print('Failed to load timezones: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +102,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                   ),
                   SizedBox(width: 16.0),
                   DropdownButton<String>(
+                      menuMaxHeight: 250,
                       value: _selectedFrequencyType ?? _frequencyTypes.first,
                       onChanged: (String? value) {
                         setState(() {
@@ -98,6 +116,31 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           child: Text(value),
                         );
                       }).toList()),
+                ],
+              ),
+              SizedBox(height: 16.0),
+              Row(
+                children: [
+                  Text('Timezone: '),
+                  SizedBox(width: 20.0),
+                  Expanded(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      menuMaxHeight: 400,
+                      value: _selectedTimezone ?? (_timezones.isNotEmpty ? _timezones.first : null),
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedTimezone = value;
+                        });
+                      },
+                      items: _timezones.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 16.0),
@@ -206,6 +249,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
         additionalInfo: additionalInfo,
         price: price,
         currency: currency.toLowerCase(),
+        timezone: _selectedTimezone, // Set timezone here
       );
 
       MedTrackerDataSource.instance

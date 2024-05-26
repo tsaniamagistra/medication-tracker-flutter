@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:med_tracker/api/data_source.dart';
-import 'package:med_tracker/services/currency_list.dart';
+import 'package:med_tracker/models/currency_list.dart';
 
 class ConvertPricePage extends StatefulWidget {
   final String medicineId;
