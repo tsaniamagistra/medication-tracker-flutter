@@ -59,7 +59,20 @@ class ExchangeDataSource {
     return ExchangeBaseNetwork.get('currencies/$baseCurrency.json');
   }
 
+  // tidak dipakai karena terlalu panjang untuk dimodelkan, beralih ke services/currency_list
   Future<Map<String, dynamic>> getCurrencies() {
     return ExchangeBaseNetwork.get('currencies.json');
+  }
+}
+
+class TimeAPIDataSource {
+  static TimeAPIDataSource instance = TimeAPIDataSource();
+
+  Future<Map<String, dynamic>> convertTimeZone(Map<String, dynamic> requestBody) {
+    return TimeAPIBaseNetwork.post('Conversion/ConvertTimeZone', requestBody);
+  }
+
+  Future<List> getTimezones() {
+    return TimeAPIBaseNetwork.getList('TimeZone/AvailableTimeZones');
   }
 }

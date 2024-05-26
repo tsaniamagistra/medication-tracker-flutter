@@ -214,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                         },
                       ),
                       IconButton(
-                        icon: Icon(Icons.edit, color: Colors.grey),
+                        icon: Icon(Icons.arrow_outward, color: Colors.grey),
                         onPressed: () {
                           _editMedicine(medicine.id!, medicine.name!);
                         },
@@ -238,15 +238,6 @@ class _HomePageState extends State<HomePage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              ElevatedButton(
-                onPressed: () {
-                  /*Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => EditMedicinePage(medicineId: medicineId)),
-                  );*/
-                },
-                child: Text('Edit Medicine Details'),
-              ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
