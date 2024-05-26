@@ -18,13 +18,13 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
   final TextEditingController _frequencyController = TextEditingController();
   final TextEditingController _additionalInfoController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  TimeOfDay? _selectedTime;
   String? _selectedFrequencyType;
   List<String> _frequencyTypes = ['Day', 'Week', 'Month', 'Year'];
   String? _selectedCurrency;
   List<String> _currencies = currencyList.map((currency) => currency.toLowerCase()).toList();
   String? _selectedTimezone;
   List<String> _timezones = [];
+  List<TimeOfDay> _doseTimes = [];
 
   @override
   void initState() {
@@ -144,14 +144,22 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                 ],
               ),
               SizedBox(height: 16.0),
-              ListTile(
-                title: Text(
-                  _selectedTime == null
-                      ? 'Select Dose Time'
-                      : 'Dose Time: ${_selectedTime!.format(context)}',
+              // mengubah setiap elemen dalam daftar _doseTimes menjadi sebuah widget ListTile
+              ..._doseTimes.map((time) => ListTile(
+                title: Text('Dose Time: ${time.format(context)}'),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    setState(() {
+                      _doseTimes.remove(time);
+                    });
+                  },
                 ),
-                trailing: Icon(Icons.timer),
-                onTap: _pickTime,
+              )),
+              SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: _pickTime,
+                child: Text('+ Add Dose Time'),
               ),
               SizedBox(height: 16.0),
               TextFormField(
@@ -223,7 +231,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
     );
     if (pickedTime != null) {
       setState(() {
-        _selectedTime = pickedTime;
+        _doseTimes.add(pickedTime);
       });
     }
   }
@@ -238,14 +246,12 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
     String? currency = _priceController.text.trim().isNotEmpty ? _selectedCurrency : null;
     String additionalInfo = _additionalInfoController.text.trim();
 
-    List<DoseSchedules> doseSchedules = [];
-    String? timezone;
+    List<DoseSchedules> doseSchedules = _doseTimes.map((time) {
+      String formattedTime = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+      return DoseSchedules(time: formattedTime);
+    }).toList();
 
-    if (_selectedTime != null) {
-      String formattedTime = '${_selectedTime!.hour}:${_selectedTime!.minute}';
-      doseSchedules = [DoseSchedules(time: formattedTime)];
-      timezone = _selectedTimezone;
-    }
+    String? timezone = _doseTimes.isNotEmpty ? _selectedTimezone : null;
 
     if (userId != null) {
       Medicine newMedicine = Medicine(
