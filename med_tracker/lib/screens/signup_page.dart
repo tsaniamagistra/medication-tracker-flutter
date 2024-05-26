@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:med_tracker/models/user.dart';
 import 'package:med_tracker/screens/login_page.dart';
 import 'package:med_tracker/api/data_source.dart';
+import 'package:med_tracker/services/encryption.dart';
+import 'package:email_validator/email_validator.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
@@ -20,18 +22,15 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Signup'),
+        title: Text('Sign Up'),
       ),
       body: Padding(
         padding: EdgeInsets.all(20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _nameField(),
-            SizedBox(height: 20),
             _emailField(),
-            SizedBox(height: 20),
             _passwordField(),
             SizedBox(height: 20),
             _signupButton(context),
@@ -46,7 +45,6 @@ class _SignupPageState extends State<SignupPage> {
       onChanged: (value) => name = value,
       decoration: InputDecoration(
         labelText: 'Name',
-        border: OutlineInputBorder(),
       ),
     );
   }
@@ -56,7 +54,6 @@ class _SignupPageState extends State<SignupPage> {
       onChanged: (value) => email = value,
       decoration: InputDecoration(
         labelText: 'Email',
-        border: OutlineInputBorder(),
       ),
     );
   }
@@ -67,7 +64,6 @@ class _SignupPageState extends State<SignupPage> {
       obscureText: true,
       decoration: InputDecoration(
         labelText: 'Password',
-        border: OutlineInputBorder(),
       ),
     );
   }
@@ -76,20 +72,35 @@ class _SignupPageState extends State<SignupPage> {
     return ElevatedButton(
       onPressed: () async {
         String text = "";
-        if (await signupNewUser(email, password, name)) {
+        if (name.isEmpty || email.isEmpty || password.isEmpty) {
           setState(() {
-            text = "Signup is successful. Please login";
-            isSignupSuccess = true;
-          });
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
-        } else {
-          setState(() {
-            text = "Signup failed";
+            text = "Please fill in all fields";
             isSignupSuccess = false;
           });
+        } else if (!EmailValidator.validate(email)) {
+          setState(() {
+            text = "Invalid email format";
+            isSignupSuccess = false;
+          });
+        } else {
+          // hash password sebelum mengirimkannya ke server
+          String hashedPassword = Encryption.hashPassword(password);
+
+          if (await signupNewUser(email, hashedPassword, name)) {
+            setState(() {
+              text = "Sign up is successful. Please login";
+              isSignupSuccess = true;
+            });
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+            );
+          } else {
+            setState(() {
+              text = "Sign up failed";
+              isSignupSuccess = false;
+            });
+          }
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -100,7 +111,7 @@ class _SignupPageState extends State<SignupPage> {
         );
       },
       child: Text(
-        'Signup',
+        'Sign Up',
         style: TextStyle(fontSize: 16.0),
       ),
     );

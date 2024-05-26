@@ -24,15 +24,13 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadUserInfo() async {
     final id = await SessionManager.getUserId();
     Map<String, dynamic>? userData = await MedTrackerDataSource.instance.getUserById(id!);
-    if (userData != null) {
-      setState(() {
-        userId = id;
-        userName = userData['name'] ?? '';
-        userEmail = userData['email'] ?? '';
-        profilePicture = userData['profilePicture'] ?? '';
-      });
+    setState(() {
+      userId = id;
+      userName = userData['name'] ?? '';
+      userEmail = userData['email'] ?? '';
+      profilePicture = userData['profilePicture'] ?? '';
+    });
     }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
       body: Center(
         child: userId == null ||
                 userName == null ||
-                userEmail == null ||
-                profilePicture == null
+                userEmail == null
             ? CircularProgressIndicator()
             : Center(
                 child: Column(

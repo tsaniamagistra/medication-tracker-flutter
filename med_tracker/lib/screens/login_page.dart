@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:med_tracker/models/user.dart';
 import 'package:med_tracker/screens/home_page.dart';
 import 'package:med_tracker/screens/signup_page.dart';
+import 'package:med_tracker/services/encryption.dart';
 import 'package:med_tracker/services/session_manager.dart';
 import 'package:med_tracker/api/data_source.dart';
+import 'package:email_validator/email_validator.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,17 +24,46 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Padding(
-          padding: EdgeInsets.all(16.0),
+        resizeToAvoidBottomInset: true,
+        body: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _emailField(),
-              _passwordField(),
-              SizedBox(height: 10),
-              _signupOption(context),
-              SizedBox(height: 10),
-              _loginButton(context),
+              ClipPath(
+                clipper: OvalBottomBorderClipper(),
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.45,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/pharmacy.jpg"),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 25),
+                    Text(
+                      'Welcome to Med Tracker!',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    _emailField(),
+                    _passwordField(),
+                    SizedBox(height: 10),
+                    _signupOption(context),
+                    SizedBox(height: 10),
+                    _loginButton(context),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -66,21 +98,36 @@ class _LoginPageState extends State<LoginPage> {
     return ElevatedButton(
       onPressed: () async {
         String text = "";
-        if (await checkCredentials(email, password)) {
-          await SessionManager.setLoggedIn(true);
+        if (email.isEmpty || password.isEmpty) {
           setState(() {
-            text = "Login Success";
-            isLoginSuccess = true;
-          });
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
-        } else {
-          setState(() {
-            text = "Login Failed";
+            text = "Please fill in all fields";
             isLoginSuccess = false;
           });
+        } else if (!EmailValidator.validate(email)) {
+          setState(() {
+            text = "Invalid email format";
+            isLoginSuccess = false;
+          });
+        } else {
+          // hash password sebelum membandingkan dengan yang tersimpan di database
+          String hashedPassword = Encryption.hashPassword(password);
+
+          if (await checkCredentials(email, hashedPassword)) {
+            await SessionManager.setLoggedIn(true);
+            setState(() {
+              text = "Login Success";
+              isLoginSuccess = true;
+            });
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          } else {
+            setState(() {
+              text = "Invalid email or password";
+              isLoginSuccess = false;
+            });
+          }
         }
 
         SnackBar snackBar = SnackBar(
