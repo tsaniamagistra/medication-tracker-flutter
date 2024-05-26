@@ -4,9 +4,8 @@ import 'package:med_tracker/screens/home_page.dart';
 
 class ConvertTimePage extends StatefulWidget {
   final String medicineId;
-  final String medicineName;
 
-  ConvertTimePage({required this.medicineId, required this.medicineName});
+  ConvertTimePage({required this.medicineId,});
 
   @override
   _ConvertTimePageState createState() => _ConvertTimePageState();
@@ -26,9 +25,11 @@ class _ConvertTimePageState extends State<ConvertTimePage> {
   }
 
   Future<Map<String, dynamic>> _loadMedicineDetails() async {
-    Map<String, dynamic> medicine = await MedTrackerDataSource.instance.getMedicineById(widget.medicineId);
+    Map<String, dynamic> medicine =
+        await MedTrackerDataSource.instance.getMedicineById(widget.medicineId);
 
-    if (medicine['doseSchedules'] == null || medicine['doseSchedules'].isEmpty) {
+    if (medicine['doseSchedules'] == null ||
+        medicine['doseSchedules'].isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Selected medicine doesn\'t have any time'),
@@ -61,13 +62,20 @@ class _ConvertTimePageState extends State<ConvertTimePage> {
     for (var object in medicine['doseSchedules']) {
       // ubah ke format DateTime agar bisa diterima API
       final DateTime now = DateTime.now();
-      final String formattedDateTime = '${now.year}-${now.month}-${now.day} ${object['time']}';
+      String _formatNumber(int number) {
+        return number.toString().padLeft(2, '0');
+      }
+
+      final String formattedDateTime =
+          '${now.year}-${_formatNumber(now.month)}-${_formatNumber(now.day)} ${object['time']}:00';
       final requestBody = {
-        'fromTimezone': medicine['timezone'],
-        'fromDateTime': formattedDateTime,
+        'fromTimeZone': medicine['timezone'],
+        'dateTime': formattedDateTime,
         'toTimeZone': _selectedTimezone,
+        'dstAmbiguity': '',
       };
-      final response = await TimeAPIDataSource.instance.convertTimeZone(requestBody);
+      final response =
+          await TimeAPIDataSource.instance.convertTimeZone(requestBody);
       if (response['error'] != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -92,7 +100,7 @@ class _ConvertTimePageState extends State<ConvertTimePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Convert Time of ${widget.medicineName}'),
+        title: Text('Convert Dose Times', style: TextStyle(fontSize: 20)),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _medicineFuture,
@@ -103,41 +111,60 @@ class _ConvertTimePageState extends State<ConvertTimePage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             final medicine = snapshot.data!;
-            return Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Dose Times in ${medicine['name']}',
-                    style: TextStyle(fontSize: 18.0),
-                  ),
-                  ...medicine['doseSchedules'].map<Widget>((schedule) => Text(schedule['time'])).toList(),
-                  SizedBox(height: 20.0),
-                  DropdownButton<String>(
-                    value: _selectedTimezone,
-                    items: _timezones.map((timezone) {
-                      return DropdownMenuItem<String>(
-                        value: timezone,
-                        child: Text(timezone),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedTimezone = newValue!;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 10.0),
-                  ElevatedButton(
-                    onPressed: () => _convertDoseTimes(medicine),
-                    child: Text('Convert Times'),
-                  ),
-                  SizedBox(height: 20.0),
-                  if (_convertedTimes.isNotEmpty)
-                    ..._convertedTimes.map((result) => Text(result)).toList(),
-                ],
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Dose Times for ${medicine['name']}',
+                      style: TextStyle(fontSize: 20.0),
+                    ),
+                    SizedBox(height: 20.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: medicine['doseSchedules']
+                          .map<Widget>((schedule) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: Text(schedule['time'], style: TextStyle(fontSize: 20),),
+                      ))
+                          .toList(),
+                    ),
+                    SizedBox(height: 20.0),
+                    DropdownButton<String>(
+                      value: _selectedTimezone,
+                      items: _timezones.map((timezone) {
+                        return DropdownMenuItem<String>(
+                          value: timezone,
+                          child: Text(timezone),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedTimezone = newValue!;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 20.0),
+                    ElevatedButton(
+                      onPressed: () => _convertDoseTimes(medicine),
+                      child: Text('Convert Times'),
+                    ),
+                    SizedBox(height: 20.0),
+                    if (_convertedTimes.isNotEmpty)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: _convertedTimes
+                            .map<Widget>((time) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Text(time, style: TextStyle(fontSize: 20),),
+                        ))
+                            .toList(),
+                      ),
+                  ],
+                ),
               ),
             );
           } else {
