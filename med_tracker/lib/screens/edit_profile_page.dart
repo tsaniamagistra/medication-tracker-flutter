@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,6 +5,7 @@ import 'package:med_tracker/api/data_source.dart';
 import 'package:med_tracker/screens/profile_page.dart';
 import 'package:med_tracker/services/encryption.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:http/http.dart' as http;
 
 
 class EditProfilePage extends StatefulWidget {
@@ -61,41 +61,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final String email = _emailController.text.trim();
       final String password = _passwordController.text.trim();
 
-      Map<String, dynamic> requestBody = {};
+      var request = http.MultipartRequest('PUT', Uri.parse('https://medication-tracker-api-etbhqtntia-et.a.run.app/user/update/${widget.userId}'));
+      request.headers['Content-Type'] = 'multipart/form-data';
 
+      request.fields['userId'] = widget.userId;
       if (password.isNotEmpty) {
-        requestBody['password'] = Encryption.hashPassword(password);
+        request.fields['password'] = Encryption.hashPassword(password);
       }
-
-      if (_newProfilePicture != null) {
-        final bytes = await _newProfilePicture!.readAsBytes();
-        requestBody['profilePicture'] = base64Encode(bytes);
-      }
-
       if (name.isNotEmpty) {
-        requestBody['name'] = name;
+        request.fields['name'] = name;
       }
-
       if (email.isNotEmpty) {
-        requestBody['email'] = email;
+        request.fields['email'] = email;
       }
-
-      print('Request Payload: $requestBody');
+      if (_newProfilePicture != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'profilePicture',
+          _newProfilePicture!.path,
+        ));
+      }
 
       try {
-        final response = await MedTrackerDataSource.instance.updateUserById(widget.userId, requestBody);
-
-        if (response['error'] == false) {
+        final streamedResponse = await request.send();
+        final response = await http.Response.fromStream(streamedResponse);
+        if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ProfilePage()),
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile: ${response['message']}')));
+          print('Failed to update profile: ${response.statusCode}');
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update profile: $e')));
+        print('Failed to update profile: $e');
       }
     }
   }

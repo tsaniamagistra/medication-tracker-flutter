@@ -19,6 +19,7 @@ class MedTrackerBaseNetwork {
     debugPrint("BaseNetwork - fullUrl : $fullUrl");
     final response = await http.get(Uri.parse(fullUrl));
     debugPrint("BaseNetwork - response : ${response.body}");
+
     return _processListResponse(response);
   }
 
