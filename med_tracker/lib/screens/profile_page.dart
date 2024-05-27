@@ -61,7 +61,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     profilePicture != null
                         ? CircleAvatar(
                             radius: 50,
-                            // parameter acak pada URL utk menghindari caching gambar di sisi klien
+                            // parameter acak pada URL utk menghindari caching gambar
+                            // object bucket google cloud public URL caching, authenticated URL tdk
                             backgroundImage: NetworkImage(
                                 '$profilePicture?timestamp=${Random().nextInt(10000)}'),
                           )

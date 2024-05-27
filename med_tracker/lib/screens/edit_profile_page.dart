@@ -7,7 +7,6 @@ import 'package:med_tracker/services/encryption.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:http/http.dart' as http;
 
-
 class EditProfilePage extends StatefulWidget {
   final String userId;
 
@@ -33,7 +32,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> _loadUserData() async {
     try {
-      final user = await MedTrackerDataSource.instance.getUserById(widget.userId);
+      final user =
+          await MedTrackerDataSource.instance.getUserById(widget.userId);
       setState(() {
         _nameController.text = user['name'];
         _emailController.text = user['email'];
@@ -61,7 +61,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final String email = _emailController.text.trim();
       final String password = _passwordController.text.trim();
 
-      var request = http.MultipartRequest('PUT', Uri.parse('https://medication-tracker-api-etbhqtntia-et.a.run.app/user/update/${widget.userId}'));
+      var request = http.MultipartRequest(
+          'PUT',
+          Uri.parse(
+              'https://medication-tracker-api-etbhqtntia-et.a.run.app/user/update/${widget.userId}'));
       request.headers['Content-Type'] = 'multipart/form-data';
 
       request.fields['userId'] = widget.userId;
@@ -85,7 +88,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         final streamedResponse = await request.send();
         final response = await http.Response.fromStream(streamedResponse);
         if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Profile updated successfully')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Profile updated successfully'),
+            backgroundColor: Colors.green,
+          ));
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ProfilePage()),
@@ -115,11 +121,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 alignment: Alignment.bottomRight,
                 children: [
                   ClipOval(
+                    // beri parameter acak pada URL _profilePicture utk menghindari caching gambar
+                    // object bucket google cloud public URL caching, authenticated URL tdk
                     child: _newProfilePicture != null
-                        ? Image.file(_newProfilePicture!, width: 100, height: 100, fit: BoxFit.cover)
+                        ? Image.file(_newProfilePicture!,
+                            width: 100, height: 100, fit: BoxFit.cover)
                         : (_profilePicture != null
-                        ? Image.network(_profilePicture!, width: 100, height: 100, fit: BoxFit.cover)
-                        : Icon(Icons.account_circle, size: 100)),
+                            ? Image.network(
+                                '$_profilePicture?random=${DateTime.now().millisecondsSinceEpoch}',
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              )
+                            : Icon(Icons.account_circle, size: 100)),
                   ),
                   Positioned(
                     bottom: 0,
