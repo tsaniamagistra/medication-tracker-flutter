@@ -122,6 +122,11 @@ class _ConvertTimePageState extends State<ConvertTimePage> {
                       'Dose Times for ${medicine['name']}',
                       style: TextStyle(fontSize: 20.0),
                     ),
+                    SizedBox(height: 14.0),
+                    Text(
+                      '${medicine['timezone']}',
+                      style: TextStyle(fontSize: 16.0),
+                    ),
                     SizedBox(height: 20.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

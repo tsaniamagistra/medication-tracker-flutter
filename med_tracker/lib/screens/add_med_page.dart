@@ -114,7 +114,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text(value),
+                          child: Text(value, style: TextStyle(fontWeight: FontWeight.normal)),
                         );
                       }).toList()),
                 ],
@@ -137,7 +137,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                       items: _timezones.map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text(value),
+                          child: Text(value, style: TextStyle(fontWeight: FontWeight.normal)),
                         );
                       }).toList(),
                     ),
@@ -145,22 +145,40 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                 ],
               ),
               SizedBox(height: 16.0),
-              // mengubah setiap elemen dalam daftar _doseTimes menjadi sebuah widget ListTile
-              ..._doseTimes.map((time) => ListTile(
-                title: Text('Dose Time: ${time.format(context)}'),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    setState(() {
-                      _doseTimes.remove(time);
-                    });
-                  },
-                ),
-              )),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: _pickTime,
-                child: Text('+ Add Dose Time'),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Dose Time:',
+                      ),
+                      Spacer(),
+                      IconButton(
+                        onPressed: _pickTime,
+                        icon: Row(
+                          children: [
+                            Icon(Icons.add),
+                            Icon(Icons.access_time),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.0),
+                  // mengubah setiap elemen dalam daftar _doseTimes menjadi sebuah widget ListTile
+                  ..._doseTimes.map((time) => ListTile(
+                    title: Text('${time.format(context)}'),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        setState(() {
+                          _doseTimes.remove(time);
+                        });
+                      },
+                    ),
+                  )),
+                ],
               ),
               SizedBox(height: 16.0),
               TextFormField(
@@ -196,7 +214,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text(value.toUpperCase()),
+                          child: Text(value.toUpperCase(), style: TextStyle(fontWeight: FontWeight.normal)),
                         );
                       }).toList()),
                 ],
@@ -212,7 +230,7 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
                     );
                   }
                 },
-                child: Text('Add Medicine'),
+                child: Text('Save Medicine'),
               ),
             ],
           ),
