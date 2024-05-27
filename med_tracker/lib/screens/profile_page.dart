@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:med_tracker/api/data_source.dart';
+import 'package:med_tracker/screens/edit_profile_page.dart';
 import 'package:med_tracker/services/session_manager.dart';
 import 'package:med_tracker/widgets/bottom_navbar.dart';
 import 'dart:math';
@@ -23,28 +24,34 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadUserInfo() async {
     final id = await SessionManager.getUserId();
-    Map<String, dynamic>? userData = await MedTrackerDataSource.instance.getUserById(id!);
+    Map<String, dynamic>? userData =
+        await MedTrackerDataSource.instance.getUserById(id!);
     setState(() {
       userId = id;
       userName = userData['name'] ?? '';
       userEmail = userData['email'] ?? '';
       profilePicture = userData['profilePicture'] ?? '';
     });
-    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavBar(selectedIndex: 0),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditProfilePage(userId: userId!),
+            ),
+          );
+        },
         tooltip: 'Edit Profile',
         child: Icon(Icons.edit),
       ),
       body: Center(
-        child: userId == null ||
-                userName == null ||
-                userEmail == null
+        child: userId == null || userName == null || userEmail == null
             ? CircularProgressIndicator()
             : Center(
                 child: Column(
@@ -55,7 +62,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         ? CircleAvatar(
                             radius: 50,
                             // parameter acak pada URL utk menghindari caching gambar di sisi klien
-                            backgroundImage: NetworkImage('$profilePicture?timestamp=${Random().nextInt(10000)}'),
+                            backgroundImage: NetworkImage(
+                                '$profilePicture?timestamp=${Random().nextInt(10000)}'),
                           )
                         : CircleAvatar(
                             radius: 50,

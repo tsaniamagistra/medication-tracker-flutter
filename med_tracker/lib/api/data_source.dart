@@ -44,7 +44,7 @@ class MedTrackerDataSource {
   }
 
   Future<Map<String, dynamic>> updateUserById(String id, Map<String, dynamic> requestBody) {
-    return MedTrackerBaseNetwork.put('user/$id', requestBody);
+    return MedTrackerBaseNetwork.put('user/update/$id', requestBody);
   }
 
   Future<Map<String, dynamic>> deleteUserById(String id) {
