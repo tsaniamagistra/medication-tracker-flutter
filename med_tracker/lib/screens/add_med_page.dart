@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:med_tracker/api/data_source.dart';
 import 'package:med_tracker/models/medicine.dart';
 import 'package:med_tracker/screens/home_page.dart';
@@ -264,10 +265,12 @@ class _AddMedicinePageState extends State<AddMedicinePage> {
       );
 
       MedTrackerDataSource.instance.createMedicine(newMedicine.toJson()).then((response) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Medicine added successfully!'),
-            backgroundColor: Colors.green,
+        AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: 1,
+            channelKey: 'basic_channel',
+            title: 'Success!',
+            body: 'You just added a new medicine.',
           ),
         );
       }).catchError((error) {

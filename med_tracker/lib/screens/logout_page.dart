@@ -10,6 +10,7 @@ class LogoutPage extends StatelessWidget {
     return Scaffold(
       bottomNavigationBar: BottomNavBar(selectedIndex: 3),
       body: AlertDialog(
+        backgroundColor: Colors.grey[200],
         title: Text('Logout'),
         content: Text('Are you sure you want to log out?'),
         actions: <Widget>[

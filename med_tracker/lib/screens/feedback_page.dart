@@ -7,9 +7,6 @@ class FeedbackPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Feedback'),
-      ),
       bottomNavigationBar: BottomNavBar(selectedIndex: 2),
       body: Center(
         child: Container(

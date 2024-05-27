@@ -97,9 +97,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
             MaterialPageRoute(builder: (context) => ProfilePage()),
           );
         } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Failed to update profile'),
+            backgroundColor: Colors.red,
+          ));
           print('Failed to update profile: ${response.statusCode}');
         }
       } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Failed to update profile'),
+          backgroundColor: Colors.red,
+        ));
         print('Failed to update profile: $e');
       }
     }

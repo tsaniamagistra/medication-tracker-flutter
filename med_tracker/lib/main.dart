@@ -5,8 +5,24 @@ import 'package:med_tracker/screens/login_page.dart';
 import 'package:med_tracker/screens/logout_page.dart';
 import 'package:med_tracker/screens/profile_page.dart';
 import 'package:med_tracker/services/session_manager.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  AwesomeNotifications().initialize(
+    'resource://drawable/med_tracker',
+    [
+      NotificationChannel(
+        channelKey: 'basic_channel',
+        channelName: 'Basic notifications',
+        channelDescription: 'Notification channel for basic',
+        defaultColor: Colors.deepPurple,
+        ledColor: Colors.white,
+      )
+    ],
+  );
+
   runApp(const MyApp());
 }
 
